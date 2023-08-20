@@ -60,3 +60,9 @@ resource "aws_backup_selection" "example" {
   }
 }
 
+resource "aws_backup_vault_lock_configuration" "test" {
+  backup_vault_name   = aws_backup_vault.example.name
+  max_retention_days  = 365
+  min_retention_days  = 7
+}
+
