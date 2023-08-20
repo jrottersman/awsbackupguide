@@ -33,3 +33,30 @@ resource "aws_iam_role_policy_attachment" "backup-attach" {
   policy_arn = data.aws_iam_policy.backup_policy.arn
 }
 
+resource "aws_backup_plan" "example" {
+  name = "example_backup_plan"
+
+  rule {
+    rule_name         = "example_backup_rule"
+    target_vault_name = aws_backup_vault.example.name
+    schedule          = "cron(0 0 * * ? *)"
+
+    lifecycle {
+      cold_storage_after = 30
+      delete_after       = 365
+    }
+  }
+}
+
+resource "aws_backup_selection" "example" {
+  iam_role_arn = aws_iam_role.backup_service_role.arn
+  name         = "example_backup_selection"
+  plan_id      = aws_backup_plan.example.id
+
+  selection_tag {
+    type  = "STRINGEQUALS"
+    key   = "backup"
+    value = "True"
+  }
+}
+
